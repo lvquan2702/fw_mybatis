@@ -6,6 +6,8 @@ import org.apache.ibatis.type.Alias;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Builder
 @Getter
@@ -22,5 +24,5 @@ public class User implements Serializable {
     private String phone;
     private Date created_at;
     private Date updated_at;
-
+    private Set<Role> roles = new HashSet<>();
 }

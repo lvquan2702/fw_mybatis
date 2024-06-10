@@ -1,4 +1,4 @@
-package com.fw.model.response;
+package com.fw.payload.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

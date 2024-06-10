@@ -1,4 +1,4 @@
-package com.fw.model.request;
+package com.fw.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

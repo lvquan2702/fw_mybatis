@@ -6,9 +6,10 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.Reader;
 import java.util.*;
 
@@ -62,6 +63,27 @@ public class UserMapperImpl implements UserMapper {
         System.out.println(result);
         sqlSession.close();
         return result;
+    }
+
+    @Override
+    public User findByName(String usernm) throws Exception {
+        return null;
+    }
+
+
+    @Autowired
+    @Lazy
+    private UserMapper userMapper;
+
+    public List<User> login(String usernm) throws Exception {
+        User user = new User();
+        user.setUsernm(usernm);
+        Reader reader = Resources.getResourceAsReader("Mybatis-config.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        List<User> users = sqlSession.selectList("User.findByName", usernm);
+        sqlSession.close();
+        return users;
     }
 
 

@@ -41,12 +41,18 @@
 
     <update id="updateUserById" parameterType="com.fw.model.User">
         UPDATE fw_test.tbl_user
-        SET
-            usernm = #{usernm},
-            password = #{password},
-            phone = #{phone},
-            email = #{email},
+        SET usernm     = #{usernm},
+            password   = #{password},
+            phone      = #{phone},
+            email      = #{email},
             updated_at = now()
         where id = #{id}
     </update>
+    <select id="findByName" resultType="com.fw.model.User">
+        SELECT *
+        FROM TBL_USER
+        where usernm = #{usernm}
+--         and password =
+    </select>
+
 </mapper>

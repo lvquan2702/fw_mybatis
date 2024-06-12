@@ -16,10 +16,10 @@ public interface UserMapper  {
 
     long addNewUser(User user) throws Exception;
 
-    long deleteUserById(int userId, User user) throws Exception;
+    long deleteUserById(int userId) throws Exception;
 
-    User findByName(String usernm) throws Exception;
-
+    List<User> findByName(String usernm) throws Exception;
+    List<User> findById(int id) throws Exception;
 
     List<User> login(String usernm) throws Exception;
 }

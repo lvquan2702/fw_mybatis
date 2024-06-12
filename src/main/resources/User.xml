@@ -54,5 +54,10 @@
         where usernm = #{usernm}
 --         and password =
     </select>
-
+    <select id="findById" resultType="com.fw.model.User">
+        SELECT *
+        FROM TBL_USER
+        where id = #{id}
+--         and password =
+    </select>
 </mapper>

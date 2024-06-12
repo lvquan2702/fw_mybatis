@@ -34,6 +34,7 @@ public class UserMapperImpl implements UserMapper {
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
         SqlSession sqlSession = sqlSessionFactory.openSession();
         sqlSession.insert("User.insertUser", user);
+        sqlSession.commit();
         sqlSession.close();
         return user.getId();
     }
@@ -52,13 +53,11 @@ public class UserMapperImpl implements UserMapper {
     }
 
     @Override
-    public long deleteUserById(int userId, User user) throws Exception {
-        new User();
-        user.setId(userId);
+    public long deleteUserById(int userId) throws Exception {
         Reader reader = Resources.getResourceAsReader("Mybatis-config.xml");
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
         SqlSession sqlSession = sqlSessionFactory.openSession();
-        int result = sqlSession.delete("User.deleteUserById", user);
+        int result = sqlSession.delete("User.deleteUserById",userId);
         sqlSession.commit();
         System.out.println(result);
         sqlSession.close();
@@ -66,8 +65,27 @@ public class UserMapperImpl implements UserMapper {
     }
 
     @Override
-    public User findByName(String usernm) throws Exception {
-        return null;
+    public List<User> findByName(String usernm) throws Exception {
+        User user = new User();
+        user.setUsernm(usernm);
+        Reader reader = Resources.getResourceAsReader("Mybatis-config.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        List<User> users = sqlSession.selectList("User.findByName", usernm);
+        sqlSession.close();
+        return users;
+    }
+
+    @Override
+    public List<User> findById(int id) throws Exception {
+        User user = new User();
+        user.setId(id);
+        Reader reader = Resources.getResourceAsReader("Mybatis-config.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        List<User> users = sqlSession.selectList("User.findById", id);
+        sqlSession.close();
+        return users;
     }
 
 

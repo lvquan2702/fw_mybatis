@@ -21,7 +21,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         try {
             String authHeader = request.getHeader("Authorization");
 
-                Map<String,Object> authInfo = JwtUtils.validateToken(authHeader);
+                Map<String,Object> authInfo = JwtUtils.validateToken(authHeader,true);
                 logger.info("Login by" + authInfo.get("usernm"));
                 return true;
         } catch (Exception e) {

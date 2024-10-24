@@ -10,6 +10,11 @@
                 <property name="url" value="jdbc:postgresql://localhost:5432/fb_db_localPC" />
                 <property name="username" value="appadm" />
                 <property name="password" value="fintwin@2023" />
+
+<!--                <property name="driver" value="org.postgresql.Driver" />-->
+<!--                <property name="url" value="jdbc:postgresql://18.143.214.17:25432/fb_db/fb_db" />-->
+<!--                <property name="username" value="appadm" />-->
+<!--                <property name="password" value="appadm1234!@" />-->
             </dataSource>
         </environment>
     </environments>

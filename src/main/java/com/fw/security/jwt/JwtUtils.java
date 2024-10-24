@@ -13,7 +13,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 public class JwtUtils {
-    private static final String SECRET_KEY = "myfirstmybatisapiappabababababaababababa";
+    private static final String SECRET_KEY = "d91f0a72929403aee77799434c9a0fd230e681ff0bb095d3dc556393ab752c50";
 
     private static Key hmacKey = new SecretKeySpec(Base64.getEncoder().encode(SECRET_KEY.getBytes(StandardCharsets.UTF_8)),
             SignatureAlgorithm.HS256.getJcaName());

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="AdSts">
+    <select id="getAdRegCanByMonth" parameterType="Map" resultType="Map" >
+        SELECT gijun_il,
+               req_gb ,
+               case when req_gb = '3' then 'Registration' else 'Cancellation' end as req_gb_nm,
+               count(1) as amt
+        FROM aams_fb_regstr
+        WHERE 1=1
+          AND gijun_il IN ( #{date_prvs_month} , #{date_prvs_week},#{date_prvs_day},#{to_day} )
+          AND ret_cd = '0000'
+        GROUP BY gijun_il, req_gb , req_gb_nm
+    </select>
+</mapper>

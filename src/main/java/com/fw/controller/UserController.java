@@ -1,21 +1,19 @@
 package com.fw.controller;
 
 
-import com.fw.service.UserMapper;
+import com.fw.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.fw.common.util.StringUtil;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 @RestController
-@Validated
-@RequestMapping("/mnms")
+@RequestMapping(value ="mnms")
 public class UserController {
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
 
     @RequestMapping(value = "login.do")
     @ResponseBody
@@ -25,7 +23,7 @@ public class UserController {
         Map<String, Object> result_map = new LinkedHashMap<String, Object>();
 
         try {
-            result_map = userMapper.login(map);
+            result_map = userService.login(map);
         } catch (Exception e) {
             String msg = StringUtil.simplifyErrMsg(e.getLocalizedMessage());
             result_map.put("RSLT_CD", "999");
@@ -44,7 +42,7 @@ public class UserController {
     public Map<String, Object> testLogin(@RequestBody Map<String, Object> map) {
         Map<String, Object> users = new HashMap<>();
         try {
-            users = userMapper.testLogin(map);
+            users = userService.testLogin(map);
             return users;
         } catch (Exception e) {
             e.printStackTrace();

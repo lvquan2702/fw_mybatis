@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="User">
+
+    <select id="getUserType" resultType="Map">
+        SELECT
+            grp_nm as nm_def,
+            grp_id as cd_def
+        FROM cams_usergroup
+        ORDER BY grp_id
+    </select>
+
+    <select id="getUserList" resultType="Map">
+
+        SELECT
+            US.user_id,
+            US.user_nm,
+            CD.grp_nm as nm_def
+        FROM
+            cams_user AS US
+                INNER JOIN
+            cams_usergroup AS CD
+            ON
+                CAST(CD.grp_id as varchar)  = US.user_type_cd
+        ORDER BY
+            user_type_cd
+
+    </select>
+
+    <select id="getUserDetailList" parameterType="Map" resultType="Map">
+        SELECT
+        US.user_id,
+        US.user_nm,
+        CD.grp_nm AS cd_def,
+        US.user_type_cd,
+        CASE
+        WHEN (US.last_login_il <![CDATA[<>]]> '00000000') AND (US.last_login_si <![CDATA[<>]]> '000000')
+        THEN CONCAT(TO_CHAR(TO_DATE(US.last_login_il, 'YYYYMMDD') ,'YYYY-MM-DD'), ' ',
+        TO_CHAR(TO_TIMESTAMP( US.last_login_si,'HH24MISS') ,'HH24:MI:SS'))
+        ELSE NULL
+        END	AS last_login,
+        CASE
+        WHEN US.last_logout_il <![CDATA[<>]]> '00000000' AND US.last_logout_si <![CDATA[<>]]> '000000'
+        THEN CONCAT(TO_CHAR(TO_DATE(US.last_logout_il, 'YYYYMMDD'),'YYYY-MM-DD'), ' ',
+        TO_CHAR(TO_TIMESTAMP(US.last_logout_si,'HH24MISS') ,'HH24:MI:SS'))
+        ELSE NULL
+        END	AS last_logout,
+        TO_CHAR(TO_DATE(US.user_reg_il, 'YYYYMMDD'),'YYYY-MM-DD') AS regis_date,
+        US.active_yn,
+        US.note,
+        CASE
+        WHEN US.pw_change_il IS NOT NULL
+        THEN TO_CHAR(TO_DATE(US.pw_change_il, 'YYYYMMDD'),'YYYY-MM-DD')
+        ELSE NULL
+        END	AS pw_change_il
+        FROM
+        cams_user AS US
+        INNER JOIN
+        cams_usergroup AS CD
+        ON
+        US.user_type_cd  = cast(cd.grp_id as varchar)
+        WHERE
+        1 = 1
+        <if test="s_user_type_cd != NULL and s_user_type_cd != ''">AND US.user_type_cd = #{s_user_type_cd}</if>
+        <if test="s_user_id != NULL and s_user_id != ''">AND US.user_id =  #{s_user_id}</if>
+        ORDER BY
+        US.user_type_cd,
+        US.user_reg_il
+    </select>
+    <delete id="deleteUser" parameterType="Map">
+        DELETE FROM
+            cams_user
+        WHERE
+            user_id =  #{user_id};
+    </delete>
+
+    <insert id="insertUser" parameterType="Map">
+        INSERT INTO cams_user(
+            user_id,
+            user_nm,
+            pw,
+            user_type_cd,
+            user_reg_il,
+            active_yn,
+            note)
+        VALUES (
+                   #{user_id},
+                   #{user_nm},
+                   #{pw},
+                   #{user_type_cd},
+                   #{user_reg_il},
+                   #{active_yn},
+                   #{note});
+    </insert>
+    <select id="checkUserForLogin" resultType="Map">
+        SELECT
+            US.user_id,
+            US.user_nm,
+            US.user_type_cd,
+            CD.grp_nm nm_def,
+            US.active_yn,
+            CASE
+                WHEN (US.last_login_il <![CDATA[<>]]> '00000000') AND (US.last_login_si <![CDATA[<>]]> '000000')
+                    THEN TO_TIMESTAMP(CONCAT(US.last_login_il,' ',US.last_login_si), 'YYYYMMDD HH24MISS')
+                ELSE NULL
+                END	AS last_login,
+            CASE
+                WHEN US.last_logout_il <![CDATA[<>]]> '00000000' AND US.last_logout_si <![CDATA[<>]]> '000000'
+                    THEN TO_TIMESTAMP(CONCAT(US.last_logout_il,' ',US.last_logout_si), 'YYYYMMDD HH24MISS')
+                ELSE NULL
+                END	AS last_logout,
+            US.secret_cd,
+            US.pw_change_il
+        FROM
+            mnms_user AS US
+                INNER JOIN
+            mnms_usergroup AS CD
+            ON
+                CAST(CD.grp_id as varchar)  = US.user_type_cd
+        WHERE
+            user_id = #{user_id}
+          AND pw =#{pw}
+    </select>
+
+    <update id="updateInfoUser" parameterType="Map">
+        UPDATE mnms_user
+        SET
+        user_nm =  #{user_nm},
+        <if test="pw != NULL and pw != ''">
+            pw =  #{pw},
+            pw_change_il = TO_CHAR(CURRENT_DATE, 'YYYYMMDD'),
+        </if>
+        try_time = CASE
+        WHEN #{active_yn} = '1' AND active_yn = '0' THEN 0
+        ELSE try_time
+        END,
+        user_type_cd =  #{user_type_cd},
+        active_yn =  #{active_yn},
+        note =  #{note}
+        WHERE
+        user_id =  #{user_id};
+    </update>
+    <update id="updateInOutOfUser" parameterType="Map">
+        UPDATE mnms_user
+        SET
+        <if test="last_login_il != NULL and last_login_il != ''">
+            last_login_il =  #{last_login_il},
+        </if>
+        <if test="last_login_si != NULL and last_login_si != ''">
+            last_login_si =  #{last_login_si}
+        </if>
+        <if test="last_login_si != NULL and last_logout_si != NULL
+					and last_login_si != '' and last_logout_si != '' ">
+            ,
+        </if>
+        <if test="last_logout_il != NULL and last_logout_il != ''">
+            last_logout_il =  #{last_logout_il},
+        </if>
+        <if test="last_logout_si != NULL and last_logout_si != ''">
+            last_logout_si =  #{last_logout_si}
+        </if>
+        WHERE
+        user_id =  #{user_id};
+    </update>
+    <update id="setTryTimebyUser" parameterType="Map">
+        UPDATE mnms_user
+        SET
+            try_time = CASE
+                           WHEN #{login_sts} = TRUE THEN 0
+                           WHEN try_time = 9 THEN 9
+                           ELSE try_time + 1
+                END,
+            active_yn = CASE
+                            WHEN #{login_sts} = FALSE AND try_time >= 2 THEN '0'
+                            ELSE '1'
+                END
+        WHERE
+            user_id =  #{user_id};
+    </update>
+
+    <insert id="insertUserGrp" parameterType="Map">
+        INSERT INTO cams_usergroup(
+            grp_nm,
+            grp_action,
+            dt_insert
+        )
+        VALUES (
+
+                   #{grp_nm},
+                   #{grp_action},
+                   TO_CHAR(NOW(), 'YYYYMMDDHH24MISS'));
+    </insert>
+
+    <update id="updateUserGrp" parameterType="Map">
+        UPDATE cams_usergroup
+        SET
+            grp_nm=#{grp_nm},
+            grp_action=#{grp_action},
+            dt_update=to_char(now(), 'YYYYMMDDHH24MISS')
+        WHERE grp_id = #{grp_id}
+    </update>
+
+    <delete id="deleteUserGrp" parameterType="Map">
+        DELETE FROM
+            cams_usergroup
+        WHERE 1=1
+          AND GRP_ID =  #{grp_id}
+          AND cast(GRP_ID as varchar) NOT IN (SELECT  DISTINCT USER_TYPE_CD  FROM CAMS_USER WHERE ACTIVE_YN = '1'
+                                              UNION ALL
+                                              SELECT DISTINCT UNNEST(STRING_TO_ARRAY(menu_accessgrp, ',')) FROM cams_menumng
+        )
+    </delete>
+
+    <select id="getUserGrp" parameterType="Map" resultType="Map">
+        SELECT * FROM
+            cams_usergroup
+        WHERE 1=1
+    </select>
+
+    <select id="getCurrentPw" resultType="Map">
+        SELECT
+            pw
+        FROM cams_user
+        WHERE
+            user_id =  #{user_id}
+    </select>
+
+    <update id="updateUserPw" parameterType="Map">
+        UPDATE cams_user
+        SET
+            pw =  #{pw},
+            pw_change_il = TO_CHAR(CURRENT_DATE, 'YYYYMMDD')
+        WHERE
+            user_id =  #{user_id};
+    </update>
+
+</mapper>

@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
-public class UserMapperImpl implements UserMapper {
+public class UserServiceImpl implements UserService {
 
     @Autowired
     UserDao userDao;
@@ -81,7 +81,7 @@ public class UserMapperImpl implements UserMapper {
             throw new Exception("Authentication failed. User ID or password is incorrect.");
         }
 
-        Map<String, Object> currentUser = (Map<String, Object>) userDao.selectOne("user.checkUserForLogin", map);
+        Map<String, Object> currentUser = (Map<String, Object>) userDao.selectOne("User.checkUserForLogin", map);
 
         Map<String, Object> result_map = new HashMap<String, Object>();
 
@@ -127,7 +127,7 @@ public class UserMapperImpl implements UserMapper {
                     currentUser.put("first_login_yn", "1");
                 }
                 // update the user info
-                userDao.update("user.updateInOutOfUser", updatelogInfo);
+                userDao.update("User.updateInOutOfUser", updatelogInfo);
 
                 logger.info("Login From: {} At: {}", (String) currentUser.get("user_id"),
                         updatelogInfo.get("last_login_il").toString()
@@ -147,14 +147,14 @@ public class UserMapperImpl implements UserMapper {
         } else {
             // update User (try time and active status) when login failed
             map.put("login_sts", false);
-            userDao.update("user.setTryTimebyUser", map);
+            userDao.update("User.setTryTimebyUser", map);
 
             throw new Exception("Authentication failed. User ID or password is incorrect.");
         }
 
         // update User (try time and active status) when login success
         map.put("login_sts", true);
-        userDao.update("user.setTryTimebyUser", map);
+        userDao.update("User.setTryTimebyUser", map);
 
         return result_map;
     }

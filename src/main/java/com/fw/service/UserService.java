@@ -4,8 +4,8 @@ import org.apache.ibatis.annotations.*;
 
 import java.util.Map;
 
-@Mapper
-public interface UserMapper  {
+
+public interface UserService {
 
     Map<String, Object> login(Map<String, Object> map) throws Exception;
 
